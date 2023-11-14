@@ -1,0 +1,6 @@
+---
+- name: Bootstrap Workspace
+  hosts: localhost
+  become: true
+  roles:
+    - common

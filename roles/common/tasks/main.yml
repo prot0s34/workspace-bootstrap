@@ -1,0 +1,29 @@
+---
+- name: Check Ubuntu version
+  fail:
+    msg: "This playbook is intended for Ubuntu 20.04 only."
+  when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
+
+- name: Update apt cache
+  apt:
+    update_cache: true
+
+- name: Install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - tmux
+    - 
+# btop
+# sshmanager
+#
+
+- name: Clone dotfiles repository
+  git:
+    repo: https://github.com/prot0s34/dotfiles.git
+    dest: /tmp/dotfiles
+    update: true
+
+
+# wsl-related configuration if wsl
