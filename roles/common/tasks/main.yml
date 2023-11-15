@@ -5,10 +5,12 @@
   when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
 
 - name: Update apt cache
+  become: true
   apt:
     update_cache: true
 
 - name: Install required packages
+  become: true
   apt:
     name: "{{ item }}"
     state: present
@@ -19,11 +21,25 @@
 # sshmanager
 #
 
+- name: Binary Fetch and Install
+  become: true
+  ansible.builtin.unarchive:
+    src: "{{ item }}"
+    remote_src: true
+    dest: /usr/local/bin
+    mode: "ugo+rx"
+  loop:
+    - "https://github.com/dduan/tre/releases/download/v0.4.0/tre-v0.4.0-x86_64-unknown-linux-musl.tar.gz"
+
 - name: Clone dotfiles repository
   git:
     repo: https://github.com/prot0s34/dotfiles.git
-    dest: /tmp/dotfiles
+    dest: /tmp/dotfiles/
     update: true
+  become: true
+
+- name: Copy dotfiles in workdir
+  command: rsync -a --exclude 'README.md' --exclude '.git' /tmp/dotfiles/ ~/
 
 - name: Install tmux TMP
   git:
