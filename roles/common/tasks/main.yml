@@ -4,28 +4,65 @@
     msg: "This playbook is intended for Ubuntu 20.04 only."
   when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
 
-- name: NodeJS - fetch GPG key
-  get_url:
-    url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
-    dest: "/etc/apt/keyrings/nodesource.gpg"
+- name: Make Dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "~/.npm-global"
+    - "/etc/apt/keyrings"
+    - "~/.local/share/fonts/"
+    - "~/.local/share/nvim/site/autoload/"
+      #  become: true
+
+- name: TARs Fetch and Install
   become: true
+  ansible.builtin.unarchive:
+    src: "{{ item }}"
+    remote_src: true
+    dest: /usr/local/bin
+    mode: "ugo+rx"
+  loop:
+    - "https://github.com/dduan/tre/releases/download/v0.4.0/tre-v0.4.0-x86_64-unknown-linux-musl.tar.gz" # https://github.com/dduan/tre
+
+- name: Plain Binaries - Fetch and Install
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/usr/local/bin/{{ item.destname }}" 
+    mode: "ugo+rx"
+  loop:
+    - { url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage", destname: "nvim" }
+    - { url: "https://github.com/prot0s34/simple-ssh-manager/releases/download/v0.1.11/sshmanager", destname: "sshmanager"}
+    - { url: "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl", destname: "kubectl" }
+
+- name: User Configs and Plugins - Fetch and Install
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim", dest: "~/.local/share/nvim/site/autoload/" }
+
+    #- name: NodeJS - fetch GPG key
+    #get_url:
+    #url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
+    #dest: "/etc/apt/keyrings/nodesource.gpg"
+    #mode: '0644'
+    #force: true
+    # become: true
 
     # FIX IT 
     #- name: Import NodeJS GPG key into keyring
     # command:
-    #    cmd: "gpg --dearmor /etc/apt/keyrings/nodesource.gpg"
-    #  become: true
-
+    #  cmd: "gpg --dearmor /etc/apt/keyrings/nodesource.gpg"
+    # become: true
     #- name: NodeJS - add APT repo
     # apt_repository:
     #  repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main"
     #  state: present
-    #  become: true
+    # become: true
 
-- name: Make Dirs
-  file:
-    path: ~/.npm-global
-    state: directory
+
 
 - name: Update apt cache
   become: true
@@ -47,7 +84,6 @@
     - ca-certificates 
     - curl 
     - gnupg
-    - nodejs
     - zsh
 
 - name: Install SNAP packages
@@ -57,8 +93,13 @@
   become: true
   loop:
     - btop # https://github.com/aristocratos/btop
+    - node
+    - rustup
 
-- name: Install Oh My Zsh
+- name: Rustup install
+  command: rustup install stable
+
+- name: Check Oh My Zsh
   stat:
     path: ~/.oh-my-zsh/oh-my-zsh.sh
   register: oh_my_zsh_installed
@@ -68,36 +109,17 @@
     cmd: "curl --proto '=https' --tlsv1.2 -fsS https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh -s -- y"
   when: oh_my_zsh_installed.stat.exists == false
 
-- name: TARs Fetch and Install
-  become: true
-  ansible.builtin.unarchive:
-    src: "{{ item }}"
-    remote_src: true
-    dest: /usr/local/bin
-    mode: "ugo+rx"
-  loop:
-    - "https://github.com/dduan/tre/releases/download/v0.4.0/tre-v0.4.0-x86_64-unknown-linux-musl.tar.gz" # https://github.com/dduan/tre
-
-- name: Plain Binaries Fetch and Install
-  become: true
-  ansible.builtin.get_url:
-    url: "{{ item.url }}"
-    dest: "/usr/local/bin/{{ item.destname }}" 
-    mode: "ugo+rx"
-  loop:
-    - { url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage", destname: "nvim" }
-    - { url: "https://github.com/prot0s34/simple-ssh-manager/releases/download/v0.1.11/sshmanager", destname: "sshmanager"}
-
 # FIX IT 
 - name: Install LunarVim
   shell: curl --proto '=https' --tls1.2 -sSf https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | sh -s -- y
   become: true
 
-- name: Rustup Install
-  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    #- name: Rustup Install
+    #  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 - name: install macchina 
-  command: ~/.cargo/bin/cargo install macchina
+  #  command: ~/.cargo/bin/cargo install macchina
+  command: cargo install macchina
 
 - name: Clone dotfiles repository
   git:
@@ -105,6 +127,16 @@
     dest: /tmp/dotfiles/
     update: true
   become: true
+
+- name: Clone zsh plugins 
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    update: true
+  loop:
+    - { repo: "https://github.com/zsh-users/zsh-autosuggestions.git", dest: "~/.oh-my-zsh/custom/plugins/zsh-autosuggestions" }
+    - { repo: "https://github.com/chrissicool/zsh-256color.git", dest: "~/.oh-my-zsh/custom/plugins/zsh-256color" }
+    - { repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git", dest: "~/.oh-my-zsh/plugins/zsh-syntax-highlighting" }
 
 - name: Copy dotfiles in workdir
   command: rsync -a --exclude 'README.md' --exclude '.git' /tmp/dotfiles/ ~/
