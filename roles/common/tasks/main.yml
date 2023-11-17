@@ -12,7 +12,6 @@
     - "~/.npm-global"
     - "~/.local/share/fonts/"
     - "~/.local/share/nvim/site/autoload/"
-      #  become: true
 
 - name: Root Make Dirs
   file:
@@ -49,27 +48,6 @@
     dest: "{{ item.dest }}"
   loop:
     - { url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim", dest: "~/.local/share/nvim/site/autoload/" }
-
-    #- name: NodeJS - fetch GPG key
-    #get_url:
-    #url: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
-    #dest: "/etc/apt/keyrings/nodesource.gpg"
-    #mode: '0644'
-    #force: true
-    # become: true
-
-    # FIX IT 
-    #- name: Import NodeJS GPG key into keyring
-    # command:
-    #  cmd: "gpg --dearmor /etc/apt/keyrings/nodesource.gpg"
-    # become: true
-    #- name: NodeJS - add APT repo
-    # apt_repository:
-    #  repo: "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main"
-    #  state: present
-    # become: true
-
-
 
 - name: Update apt cache
   become: true
@@ -121,18 +99,11 @@
     cmd: "curl -sS https://starship.rs/install.sh | sh -s -- -y"
   become: true
 
-# FIX IT 
 - name: Install LunarVim
   shell: curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | bash || true
-    #  become: true
-
-    #- name: Rustup Install
-    #  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 - name: Install macchina 
-  #  command: ~/.cargo/bin/cargo install macchina
   shell: cargo install macchina && mv .cargo/bin/macchina /tmp/
-
 
 - name: mv macchina
   shell: mv /tmp/macchina /usr/local/bin/
