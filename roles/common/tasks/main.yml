@@ -44,7 +44,7 @@
     - zsh
     - zip
     - pigz
-    - pip3
+#    - pip3
 
 - name: Install SNAP packages
   snap:
@@ -65,6 +65,10 @@
   loop:
     - "https://github.com/dduan/tre/releases/download/v0.4.0/tre-v0.4.0-x86_64-unknown-linux-musl.tar.gz" # https://github.com/dduan/tre
     - "https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip"
+    - "https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz"
+    - "https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz"
+    - "https://github.com/bootandy/dust/releases/download/v0.8.6/dust-v0.8.6-x86_64-unknown-linux-gnu.tar.gz"
+    - "https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz"
 
 - name: Plain Binaries - Fetch and Install
   become: true
@@ -105,8 +109,8 @@
 - name: Install LunarVim
   shell: curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | bash || true
 
-- name: Install macchina 
-  shell: cargo install macchina && mv .cargo/bin/macchina /tmp/
+- name: Cargo Install macchina
+  shell: ~/.cargo/bin/cargo install macchina && mv ~/.cargo/bin/macchina /tmp/
 
 - name: mv macchina
   shell: mv /tmp/macchina /usr/local/bin/
@@ -133,7 +137,7 @@
   command: rsync -a --exclude 'README.md' --exclude '.git' /tmp/dotfiles/ ~/
 
 - name: Install nvim plugins
-  command: nvim +PlugInstall +qall
+  shell: nvim +PlugInstall +qall &
 
 - name: Install tmux TMP
   git:
@@ -176,14 +180,30 @@
     mode: '0644'
   become: true
 
+- name: Run krew installation script
+  ansible.builtin.shell: |
+    set -x
+    temp_dir="$(mktemp -d)"
+    cd "$temp_dir" &&
+    OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+    ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+    KREW="krew-${OS}_${ARCH}" &&
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+    tar zxvf "${KREW}.tar.gz" &&
+    ./"${KREW}" install krew
+  args:
+    executable: /bin/bash
+
+- name: Install kubectx & kubens
+  shell: |
+    kubectl krew update &&
+    kubectl krew install ctx &&
+    kubectl krew install ns
+  args:
+    executable: /bin/bash
+
     # lvim,
     # nvim-tree
     # go 1.20.5
-    # terraform
     # ansible 
     # docker 
-    # helm
-    # k9s
-    # kubectx
-    # kubens 
-    # tre alias 
