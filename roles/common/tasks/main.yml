@@ -69,6 +69,7 @@
     - "https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz"
     - "https://github.com/bootandy/dust/releases/download/v0.8.6/dust-v0.8.6-x86_64-unknown-linux-gnu.tar.gz"
     - "https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz"
+    - "https://go.dev/dl/go1.21.4.linux-amd64.tar.gz"
 
 - name: Plain Binaries - Fetch and Install
   become: true
@@ -202,8 +203,9 @@
   args:
     executable: /bin/bash
 
-    # lvim,
-    # nvim-tree
-    # go 1.20.5
-    # ansible 
-    # docker 
+- name: Install Ansible
+  command: pip3 install ansible 
+
+
+    # lvim check 
+    # nvim-tree error check 

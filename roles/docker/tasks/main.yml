@@ -1,0 +1,40 @@
+---
+- name: Install containerd cri package
+  apt:
+    name: containerd=1.7.2
+    state: present
+
+- name: Install docker-cli
+  apt:
+    deb:
+    state: present
+
+- name: Install docker engine
+  apt:
+    deb:
+    state: present
+
+- name: Install docker compose
+  apt:
+    deb: 
+  when: docker_compose_enable == 'true'
+
+- name: Install docker buildx 
+  apt:
+    deb:
+  when: docker_buildx_enable == 'true'
+
+- name: Network settings
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0644
+  notify: restart docker
+
+- name: Ensure Docker is started and enabled
+  service:
+    name: docker
+    state: 'started'
+    enabled: 'true'
+    masked: no
+
