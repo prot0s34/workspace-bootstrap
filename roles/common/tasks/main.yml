@@ -44,7 +44,8 @@
     - zsh
     - zip
     - pigz
-#    - pip3
+    - ruby-dev 
+      #    - pip3
 
 - name: Install SNAP packages
   snap:
@@ -148,6 +149,10 @@
 
 - name: Install tmux plugins
   command: ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+
+- name: Install tmuxinator
+  command: gem install tmuxinator
+  become: true
 
 - name: Clone SFMono Nerd Font repository
   git:
