@@ -71,6 +71,7 @@
     - "https://github.com/bootandy/dust/releases/download/v0.8.6/dust-v0.8.6-x86_64-unknown-linux-gnu.tar.gz"
     - "https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz"
     - "https://go.dev/dl/go1.21.4.linux-amd64.tar.gz"
+    - "https://github.com/eza-community/eza/releases/download/v0.16.0/eza_x86_64-unknown-linux-gnu.tar.gz"
 
 - name: Plain Binaries - Fetch and Install
   become: true
