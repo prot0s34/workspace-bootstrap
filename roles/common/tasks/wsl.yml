@@ -1,0 +1,19 @@
+---
+- name: Create /etc/wsl.conf
+  ansible.builtin.copy:
+    content: |
+      [network]
+      generateResolvConf = false
+      [interop]
+      appendWindowsPath = false
+      [boot]
+      systemd=true
+      [automount]
+      enabled = true
+      options = "metadata,umask=22,fmask=11"
+    dest: /etc/wsl.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
