@@ -197,6 +197,7 @@
 - name: Include WSL-related tasks
   include_tasks: wsl.yml
 
+    # https://github.com/d99kris/nmail
     # https://github.com/paul-nameless/tg
     # https://github.com/orf/gping
     # https://github.com/idoavrah/terraform-tui
