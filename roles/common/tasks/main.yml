@@ -205,3 +205,4 @@
     # https://github.com/wagoodman/dive
     # lvim check 
     # nvim-tree error check 
+    # curl -sL https://talos.dev/install | sh
