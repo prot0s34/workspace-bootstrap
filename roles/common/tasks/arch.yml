@@ -1,46 +1,45 @@
 ---
-- name: Root Make Dirs
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-    - "/etc/apt/keyrings"
+- name: Update pacman cache
   become: true
+  community.general.pacman:
+    update_cache: yes
 
-- name: Update apt cache
+- name: Install pacman packages
   become: true
-  apt:
-    update_cache: true
-
-- name: Install APT packages
-  become: true
-  apt:
+  community.general.pacman:
     name: "{{ item }}"
     state: present
   loop:
     - tmux
     - git
-    - bat # https://github.com/sharkdp/bat
+    - bat
     - make
-    - pip
+    - python-pip
     - python
-    - ca-certificates 
-    - curl 
+    - ca-certificates
+    - curl
     - gnupg
     - zsh
     - zip
     - pigz
-    - ruby-dev 
-      #    - pip3
+    - ruby
+    - btop
+    - nodejs
+    - terraform
+    - helm
+    - k9s
+    - dust
+    - duf
+    - neovim
 
-- name: Install SNAP packages
-  snap:
-    name: "{{ item }}"
-    classic: true
-  become: true
+- name: User Make Dirs
+  file:
+    path: "{{ item }}"
+    state: directory
   loop:
-    - btop # https://github.com/aristocratos/btop
-    - node
+    - "~/.npm-global"
+    - "~/.local/share/fonts/"
+    - "~/.local/share/nvim/site/autoload/"
 
 - name: Binaries Compressed - Fetch and Install
   become: true
@@ -51,13 +50,6 @@
     mode: "ugo+rx"
   loop:
     - "https://github.com/dduan/tre/releases/download/v0.4.0/tre-v0.4.0-x86_64-unknown-linux-musl.tar.gz" # https://github.com/dduan/tre
-    - "https://releases.hashicorp.com/terraform/1.6.4/terraform_1.6.4_linux_amd64.zip"
-    - "https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz"
-    - "https://github.com/derailed/k9s/releases/download/v0.28.2/k9s_Linux_amd64.tar.gz"
-    - "https://github.com/bootandy/dust/releases/download/v0.8.6/dust-v0.8.6-x86_64-unknown-linux-gnu.tar.gz"
-    - "https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_x86_64.tar.gz"
-    - "https://go.dev/dl/go1.21.4.linux-amd64.tar.gz"
-    - "https://github.com/eza-community/eza/releases/download/v0.16.0/eza_x86_64-unknown-linux-gnu.tar.gz"
 
 - name: Plain Binaries - Fetch and Install
   become: true
@@ -66,9 +58,7 @@
     dest: "/usr/local/bin/{{ item.destname }}" 
     mode: "ugo+rx"
   loop:
-    - { url: "https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage", destname: "nvim" }
     - { url: "https://github.com/prot0s34/simple-ssh-manager/releases/download/v0.1.11/sshmanager", destname: "sshmanager"}
-    - { url: "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl", destname: "kubectl" }
 
 - name: User Configs and Plugins - Fetch and Install
   get_url:
@@ -179,4 +169,5 @@
 
 - name: Install Ansible
   command: pip3 install ansible 
+
 

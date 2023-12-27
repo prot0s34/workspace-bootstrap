@@ -1,8 +1,11 @@
 ---
-- name: Check Ubuntu version
-  fail:
-    msg: "This playbook is intended for Ubuntu 20.04 only."
-  when: ansible_distribution != 'Ubuntu' or ansible_distribution_version != '20.04'
+- name: Include Ubuntu Packages Install
+  include_tasks: apt.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Include Arch Packages
+  include_tasks: arch.yml
+  when: ansible_distribution == 'Arch'
 
 - name: User Make Dirs
   file:
@@ -13,48 +16,6 @@
     - "~/.local/share/fonts/"
     - "~/.local/share/nvim/site/autoload/"
 
-- name: Root Make Dirs
-  file:
-    path: "{{ item }}"
-    state: directory
-  loop:
-    - "/etc/apt/keyrings"
-  become: true
-
-- name: Update apt cache
-  become: true
-  apt:
-    update_cache: true
-
-- name: Install APT packages
-  become: true
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - tmux
-    - git
-    - bat # https://github.com/sharkdp/bat
-    - make
-    - pip
-    - python
-    - ca-certificates 
-    - curl 
-    - gnupg
-    - zsh
-    - zip
-    - pigz
-    - ruby-dev 
-      #    - pip3
-
-- name: Install SNAP packages
-  snap:
-    name: "{{ item }}"
-    classic: true
-  become: true
-  loop:
-    - btop # https://github.com/aristocratos/btop
-    - node
 
 - name: Binaries Compressed - Fetch and Install
   become: true
