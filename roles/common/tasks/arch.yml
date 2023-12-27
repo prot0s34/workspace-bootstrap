@@ -31,6 +31,10 @@
     - dust
     - duf
     - neovim
+    - strace
+    - rustup
+    - python-pynvim
+    - rsync
 
 - name: User Make Dirs
   file:
@@ -68,7 +72,7 @@
     - { url: "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim", dest: "~/.local/share/nvim/site/autoload/" }
 
 - name: Rustup install
-  shell: curl --proto '=https' --tlsv1.3 https://sh.rustup.rs -sSf | sh -s -- -y 
+  shell: rustup default stable 
 
 - name: Check Oh My Zsh
   stat:
@@ -86,7 +90,8 @@
   become: true
 
 - name: Install LunarVim
-  shell: curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | bash || true
+  # nightly off cause using neovim 0.9.4 from pacman shell: curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | bash || true
+  shell: LV_BRANCH='release-1.3/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.3/neovim-0.9/utils/installer/install.sh)
 
 - name: Cargo Install macchina
   shell: ~/.cargo/bin/cargo install macchina && mv ~/.cargo/bin/macchina /tmp/
