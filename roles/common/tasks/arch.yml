@@ -35,6 +35,7 @@
     - rustup
     - python-pynvim
     - rsync
+    - github-cli
 
 - name: User Make Dirs
   file:
