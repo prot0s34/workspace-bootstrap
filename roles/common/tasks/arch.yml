@@ -37,6 +37,7 @@
     - rsync
     - github-cli
     - npm
+    - fzf
 
 - name: User Make Dirs
   file:
