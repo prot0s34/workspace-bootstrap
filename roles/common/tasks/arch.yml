@@ -36,6 +36,7 @@
     - python-pynvim
     - rsync
     - github-cli
+    - npm
 
 - name: User Make Dirs
   file:
@@ -176,4 +177,4 @@
 - name: Install Ansible
   command: pip3 install ansible 
 
-
+    ## npm -g install instant-markdown-d
