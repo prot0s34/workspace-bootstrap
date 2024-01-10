@@ -39,6 +39,7 @@
     - npm
     - fzf
     - git-delta
+    - sops
 
 - name: User Make Dirs
   file:
