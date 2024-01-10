@@ -38,6 +38,7 @@
     - github-cli
     - npm
     - fzf
+    - git-delta
 
 - name: User Make Dirs
   file:
