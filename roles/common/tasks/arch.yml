@@ -41,6 +41,8 @@
     - git-delta
     - sops
     - age
+    - ripgrep
+    - fd
 
 - name: User Make Dirs
   file:
