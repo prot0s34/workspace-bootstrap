@@ -43,6 +43,7 @@
     - age
     - ripgrep
     - fd
+    - ffmpeg
 
 - name: User Make Dirs
   file:
