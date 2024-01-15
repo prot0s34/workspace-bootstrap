@@ -45,6 +45,7 @@
     - fd
     - ffmpeg
     - zstd
+    - sshpass
 
 - name: User Make Dirs
   file:
