@@ -46,6 +46,7 @@
     - ffmpeg
     - zstd
     - sshpass
+    - ansible
 
 - name: User Make Dirs
   file:
