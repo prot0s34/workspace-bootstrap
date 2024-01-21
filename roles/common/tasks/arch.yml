@@ -47,6 +47,8 @@
     - zstd
     - sshpass
     - ansible
+    - kubectl
+    - kubectx
 
 - name: User Make Dirs
   file:
